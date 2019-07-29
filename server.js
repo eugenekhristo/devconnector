@@ -1,7 +1,9 @@
 require('colors');
 const express = require('express');
+const connectDb = require('./config/connectDb');
 
 const app = express();
+connectDb();
 
 app.get('/', (req, res) => {
   res.send('HI!!!!');
