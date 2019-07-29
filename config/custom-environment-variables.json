@@ -1,3 +1,4 @@
 {
-  "mongodbUri": "DEVCONNECTOR_MONGODB_URI"
+  "mongodbUri": "DEVCONNECTOR_MONGODB_URI",
+  "secretKeyJWT": "DEVCONNECTOR_SECRET_KEY_JWT"
 }

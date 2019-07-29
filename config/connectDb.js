@@ -4,7 +4,10 @@ const config = require('config');
 
 const connectDb = async () => {
   try {
-    await mongoose.connect(config.get('mongodbUri'), { useNewUrlParser: true });
+    await mongoose.connect(config.get('mongodbUri'), {
+      useNewUrlParser: true,
+      useCreateIndex: true
+    });
     console.log(`Connected to MongoDB server...`.yellow);
   } catch (error) {
     console.error(
