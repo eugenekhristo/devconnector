@@ -1,4 +1,14 @@
 const mongoose = require('mongoose');
+const { check } = require('express-validator');
+
+const profileValidation = [
+  check('status', 'Status is requried')
+    .not()
+    .isEmpty(),
+  check('skills', 'Skills is requried')
+    .not()
+    .isEmpty()
+];
 
 const ProfileSchema = new mongoose.Schema({
   user: {
@@ -112,4 +122,4 @@ const ProfileSchema = new mongoose.Schema({
 
 const Profile = mongoose.model('Profile', ProfileSchema);
 
-module.exports = { Profile };
+module.exports = { Profile, profileValidation };
