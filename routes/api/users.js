@@ -3,7 +3,21 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const gravatar = require('gravatar');
 const _ = require('lodash');
-const { User, userValidation } = require('../models/user');
+const { User, userValidation } = require('../../models/user');
+const authMiddleware = require('../../middleware/auth');
+
+// @route   GET api/users/me
+// @desc    Get current authenticated user
+// @access  Private
+router.get('/me', [authMiddleware], async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password -__v');
+    res.send(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error!');
+  }
+});
 
 // @route   POST api/users
 // @desc    Register a new user
