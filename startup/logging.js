@@ -6,13 +6,13 @@ require('winston-mongodb');
 const path = require('path');
 const config = require('config');
 
-const myFormat = printf(({ level, message, label, timestamp, stack }) => {
-  return `${timestamp} [${label}] ${level}: ${message}. ${
-    stack ? 'Stack: ' + stack : ''
-  }`;
-});
-
 module.exports = () => {
+  const myFormat = printf(({ level, message, label, timestamp, stack }) => {
+    return `${timestamp} [${label}] ${level}: ${message}. ${
+      stack ? 'Stack: ' + stack : ''
+    }`;
+  });
+
   exceptions.handle(
     new transports.Console({
       format: combine(
@@ -55,7 +55,6 @@ module.exports = () => {
     winston.add(
       new transports.File({
         filename: path.resolve(__dirname, '..', 'log', 'loginfo.log'),
-        level: 'info',
         format: combine(
           label({ label: 'VIDLY' }),
           timestamp({

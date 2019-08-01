@@ -1,7 +1,11 @@
 const router = require('express').Router();
 const { validationResult, param } = require('express-validator');
 const authMiddleware = require('../../middleware/auth');
-const { Profile, profileValidation } = require('../../models/profile');
+const {
+  Profile,
+  profileValidation,
+  experienceValidator
+} = require('../../models/profile');
 const { User } = require('../../models/user');
 
 // @route   GET api/profile
@@ -120,5 +124,64 @@ router.post('/', [authMiddleware, ...profileValidation], async (req, res) => {
   await profile.save();
   res.send(profile);
 });
+
+// @route   PUT api/profile/experience
+// @desc    Create new experience for current user
+// @access  Private
+router.put(
+  '/experience',
+  [authMiddleware, ...experienceValidator],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    if (!profile)
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'There is no profile for this user!' }] });
+
+    const userExperience = { ...req.body };
+    profile.experience.unshift(userExperience);
+    await profile.save();
+
+    res.json(profile);
+  }
+);
+
+// @route   DELETE api/profile/experience/:id
+// @desc    Delete experience from profile for current user
+// @access  Private
+router.delete(
+  '/experience/:id',
+  [authMiddleware, param('id', 'Invalid ObjectID format').isMongoId()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    const profile = await Profile.findOne({ user: req.user.id });
+    if (!profile)
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'There is no profile for this user!' }] });
+
+    const experience = profile.experience.find(exp => exp.id === req.params.id);
+    if (!experience)
+      return res.status(400).json({
+        errors: [
+          { msg: 'There is no experience for this profile with such an id!' }
+        ]
+      });
+
+    profile.experience = profile.experience.filter(
+      exp => exp.id !== req.params.id
+    );
+    await profile.save();
+    res.json(experience);
+  }
+);
 
 module.exports = router;

@@ -10,6 +10,21 @@ const profileValidation = [
     .isEmpty()
 ];
 
+const experienceValidator = [
+  check('title', 'title is requried')
+    .not()
+    .isEmpty(),
+  check('company', 'company is requried')
+    .not()
+    .isEmpty(),
+  check('from')
+    .not()
+    .isEmpty()
+    .withMessage('from is requried')
+    .isISO8601()
+    .withMessage('provide a valid date format')
+];
+
 const ProfileSchema = new mongoose.Schema({
   user: {
     type: mongoose.SchemaTypes.ObjectId,
@@ -122,4 +137,4 @@ const ProfileSchema = new mongoose.Schema({
 
 const Profile = mongoose.model('Profile', ProfileSchema);
 
-module.exports = { Profile, profileValidation };
+module.exports = { Profile, profileValidation, experienceValidator };
