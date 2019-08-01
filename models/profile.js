@@ -22,6 +22,9 @@ const experienceValidator = [
     .isEmpty()
     .withMessage('from is requried')
     .isISO8601()
+    .withMessage('provide a valid date format'),
+  check('to')
+    .isISO8601()
     .withMessage('provide a valid date format')
 ];
 
@@ -65,36 +68,6 @@ const ProfileSchema = new mongoose.Schema({
       },
       location: {
         type: String
-      },
-      from: {
-        type: Date,
-        required: true
-      },
-      to: {
-        type: Date
-      },
-      current: {
-        type: Boolean,
-        default: false
-      },
-      description: {
-        type: String
-      }
-    }
-  ],
-  education: [
-    {
-      school: {
-        type: String,
-        required: true
-      },
-      degree: {
-        type: String,
-        required: true
-      },
-      fieldofstudy: {
-        type: String,
-        required: true
       },
       from: {
         type: Date,

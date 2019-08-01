@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const { validationResult, param } = require('express-validator');
+const mongoose = require('mongoose');
+const Fawn = require('fawn');
 const authMiddleware = require('../../middleware/auth');
 const {
   Profile,
@@ -7,6 +9,9 @@ const {
   experienceValidator
 } = require('../../models/profile');
 const { User } = require('../../models/user');
+
+Fawn.init(mongoose);
+const task = Fawn.Task();
 
 // @route   GET api/profile
 // @desc    Get all profiles
@@ -123,6 +128,25 @@ router.post('/', [authMiddleware, ...profileValidation], async (req, res) => {
   profile = new Profile(profileFields);
   await profile.save();
   res.send(profile);
+});
+
+// @route   DELETE api/profile
+// @desc    Delete current profile, user and user posts
+// @access  Private
+router.delete('/', authMiddleware, async (req, res) => {
+  const profile = await Profile.findOne({ user: req.user.id });
+
+  if (!profile)
+    return res
+      .status(400)
+      .json({ errors: [{ msg: 'There is no profile for this user' }] });
+
+  task
+    .remove('profiles', { _id: profile.id })
+    .remove('users', { _id: req.user.id })
+    .run({ useMongoose: true });
+
+  res.json({ msg: 'User and their profile is deleted!' });
 });
 
 // @route   PUT api/profile/experience

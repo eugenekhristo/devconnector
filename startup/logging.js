@@ -51,19 +51,21 @@ module.exports = () => {
     })
   );
 
+  winston.add(
+    new transports.File({
+      filename: path.resolve(__dirname, '..', 'log', 'loginfo.log'),
+      level: 'error',
+      format: combine(
+        label({ label: 'VIDLY' }),
+        timestamp({
+          format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        myFormat
+      )
+    })
+  );
+
   if (process.env.NODE_ENV === 'production') {
-    winston.add(
-      new transports.File({
-        filename: path.resolve(__dirname, '..', 'log', 'loginfo.log'),
-        format: combine(
-          label({ label: 'VIDLY' }),
-          timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss'
-          }),
-          myFormat
-        )
-      })
-    );
     winston.add(
       new transports.MongoDB({
         db: config.get('mongodbUri'),
