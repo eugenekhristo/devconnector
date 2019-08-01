@@ -8,13 +8,8 @@ const { User } = require('../../models/user');
 // @desc    Get all profiles
 // @access  Public
 router.get('/', async (req, res) => {
-  try {
-    const profiles = await Profile.find().populate('user', 'name avatar email');
-    res.json(profiles);
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send('Server Error. Pease try again!');
-  }
+  const profiles = await Profile.find().populate('user', 'name avatar email');
+  res.json(profiles);
 });
 
 // @route   GET api/profile/user/:userId
@@ -28,27 +23,22 @@ router.get(
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
-    try {
-      const user = await User.findById(req.params.userId);
-      if (!user)
-        return res
-          .status(400)
-          .json({ errors: [{ msg: 'There is no user with such an id' }] });
+    const user = await User.findById(req.params.userId);
+    if (!user)
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'There is no user with such an id' }] });
 
-      const profile = await Profile.findOne({
-        user: req.params.userId
-      }).populate('user', 'name avatar email');
+    const profile = await Profile.findOne({
+      user: req.params.userId
+    }).populate('user', 'name avatar email');
 
-      if (!profile)
-        return res.status(400).json({
-          errors: [{ msg: 'There is no profile for this user!' }]
-        });
+    if (!profile)
+      return res.status(400).json({
+        errors: [{ msg: 'There is no profile for this user!' }]
+      });
 
-      res.json(profile);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server Error. Pease try again!');
-    }
+    res.json(profile);
   }
 );
 
@@ -56,22 +46,17 @@ router.get(
 // @desc    Get profile for current user
 // @access  Private
 router.get('/me', [authMiddleware], async (req, res) => {
-  try {
-    const profile = await Profile.findOne({ user: req.user.id }).populate(
-      'user',
-      'name avatar'
-    );
+  const profile = await Profile.findOne({ user: req.user.id }).populate(
+    'user',
+    'name avatar email'
+  );
 
-    if (!profile)
-      return res
-        .status(400)
-        .json({ errors: [{ msg: 'There is no profile for this user!' }] });
+  if (!profile)
+    return res
+      .status(400)
+      .json({ errors: [{ msg: 'There is no profile for this user!' }] });
 
-    res.json(profile);
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send('Server Error. Pease try again!');
-  }
+  res.json(profile);
 });
 
 // @route   POST api/profile
@@ -117,10 +102,7 @@ router.post('/', [authMiddleware, ...profileValidation], async (req, res) => {
   if (linkedin) profileFields.social.linkedin = linkedin;
   if (instagram) profileFields.social.instagram = instagram;
 
-  let profile = await Profile.findOne({ user: req.user.id }).populate(
-    'user',
-    'name email avatar'
-  );
+  let profile = await Profile.findOne({ user: req.user.id });
 
   // update profile
   if (profile) {

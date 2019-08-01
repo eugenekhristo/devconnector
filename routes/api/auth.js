@@ -25,25 +25,20 @@ router.post('/', [...userLoginValidation], async (req, res) => {
 
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
+  const user = await User.findOne({ email });
 
-    if (!user)
-      return res
-        .status(400)
-        .json({ errors: [{ msg: 'Email or password is not correct!' }] });
+  if (!user)
+    return res
+      .status(400)
+      .json({ errors: [{ msg: 'Email or password is not correct!' }] });
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid)
-      return res
-        .status(400)
-        .json({ errors: [{ msg: 'Email or password is not correct!' }] });
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid)
+    return res
+      .status(400)
+      .json({ errors: [{ msg: 'Email or password is not correct!' }] });
 
-    res.json({ token: user.generateJWT() });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error!');
-  }
+  res.json({ token: user.generateJWT() });
 });
 
 module.exports = router;
