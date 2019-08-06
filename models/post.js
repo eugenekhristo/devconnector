@@ -1,10 +1,27 @@
+const { check, param } = require('express-validator');
 const mongoose = require('mongoose');
+
+const validatePost = [
+  check('text', 'Text is required')
+    .not()
+    .isEmpty()
+];
+
+const validateObjectIDParams = (...paramNames) => {
+  return paramNames.map(paramName =>
+    param(`${paramName}`, `${paramName} is not valid ObjectID type`).isMongoId()
+  );
+};
 
 const postSchema = new mongoose.Schema({
   user: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User',
-    required: [true, 'user is required']
+    required: [true, 'user is required'],
+    validate: {
+      validator: userId => mongoose.Types.ObjectId.isValid(userId),
+      message: 'userId for user is not valid ObjectID'
+    }
   },
   text: {
     type: String,
@@ -15,11 +32,8 @@ const postSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   likes: [
     {
-      user: {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: 'User',
-        required: [true, 'likes user is required']
-      }
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User'
     }
   ],
   comments: [
@@ -43,5 +57,7 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model('Post', postSchema);
 
 module.exports = {
-  Post
+  Post,
+  validatePost,
+  validateObjectIDParams
 };
