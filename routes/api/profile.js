@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const { validationResult, param } = require('express-validator');
 const Acid = require('mongoose-acid');
+const request = require('request');
+const config = require('config');
+const winston = require('winston');
 const authMiddleware = require('../../middleware/auth');
 const {
   Profile,
@@ -130,6 +133,7 @@ router.post('/', [authMiddleware, ...profileValidation], async (req, res) => {
 // @desc    Delete current profile, user and user posts
 // @access  Private
 router.delete('/', authMiddleware, async (req, res) => {
+  //TODO delete ysers posts also
   await Acid(async function(session) {
     await Profile.findOneAndDelete({ user: req.user.id }, { session });
     await User.findByIdAndDelete(req.user.id, { session });
@@ -196,5 +200,31 @@ router.delete(
     res.json(experience);
   }
 );
+
+// @route   GET api/profile/github/:username
+// @desc    Get info about 5 recent github repos of a given user
+// @access  Public
+router.get('/github/:username', (req, res) => {
+  const options = {
+    uri: `https://api.github.com/users/${
+      req.params.username
+    }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+      'githubClientID'
+    )}&client_secret=${config.get('githubSecret')}`,
+    method: 'GET',
+    headers: { 'user-agent': 'node.js' }
+  };
+
+  request(options, (error, response, body) => {
+    if (error) return winston.error('', error);
+
+    if (response.statusCode !== 200)
+      return res
+        .status(404)
+        .json({ errors: [{ msg: 'No github user found' }] });
+
+    res.json(JSON.parse(body));
+  });
+});
 
 module.exports = router;
