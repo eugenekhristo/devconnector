@@ -29,37 +29,32 @@ router.post('/', [...userValidation], async (req, res) => {
 
   const { name, email, password } = req.body;
 
-  try {
-    // See if user exists
-    let user = await User.findOne({ email });
-    if (user)
-      return res
-        .status(400)
-        .json({ errors: [{ msg: `User with such an email already exists` }] });
+  // See if user exists
+  let user = await User.findOne({ email });
+  if (user)
+    return res
+      .status(400)
+      .json({ errors: [{ msg: `User with such an email already exists` }] });
 
-    // Get gravatar for user
-    const avatar = gravatar.url(email, {
-      s: '200',
-      r: 'pg',
-      d: 'mm'
-    });
+  // Get gravatar for user
+  const avatar = gravatar.url(email, {
+    s: '200',
+    r: 'pg',
+    d: 'mm'
+  });
 
-    user = new User({ name, email, password, avatar });
+  user = new User({ name, email, password, avatar });
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(password, salt);
 
-    await user.save();
+  await user.save();
 
-    // Send JWT
-    res
-      .header('x-auth-token', user.generateJWT())
-      .send(_.pick(user, ['_id', 'name', 'email', 'avatar', 'createdAt']));
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send('Server Error. Pease try again!');
-  }
+  // Send JWT
+  res
+    .header('x-auth-token', user.generateJWT())
+    .send(_.pick(user, ['_id', 'name', 'email', 'avatar', 'createdAt']));
 });
 
 module.exports = router;
