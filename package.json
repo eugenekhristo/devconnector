@@ -4,7 +4,6 @@
   "description": "social network for developers build with mern stack",
   "main": "server.js",
   "scripts": {
-    "start": "node server",
     "server": "nodemon server",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\" "
@@ -32,6 +31,7 @@
     "mongoose": "^5.6.7",
     "mongoose-acid": "^0.12.0",
     "request": "^2.88.0",
+    "uuid": "^3.3.2",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.0"
   },
