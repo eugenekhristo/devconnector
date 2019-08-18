@@ -54,7 +54,9 @@ router.post('/', [...userValidation], async (req, res) => {
   // Send JWT
   res
     .header('x-auth-token', user.generateJWT())
-    .send(_.pick(user, ['_id', 'name', 'email', 'avatar', 'createdAt']));
+    .json({
+      user: _.pick(user, ['_id', 'name', 'email', 'avatar', 'createdAt'])
+    });
 });
 
 module.exports = router;

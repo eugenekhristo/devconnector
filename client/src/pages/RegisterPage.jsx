@@ -1,10 +1,13 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { setAlert } from '../redux/resources/alert/alert.actions';
+import { selectAuth } from '../redux/resources/auth/auth.selectors';
+import { registerUser } from './../redux/resources/auth/auth.actions';
+import { createStructuredSelector } from 'reselect';
 
-const RegisterPage = ({ setAlert }) => {
+const RegisterPage = ({ setAlert, registerUser, auth }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,11 +22,14 @@ const RegisterPage = ({ setAlert }) => {
 
   const handleSubmit = async e => {
     e.preventDefault();
-
+    const { name, email, password } = formData;
     if (password !== password2) return setAlert("Passwords don't match");
-
-    console.log('success');
+    registerUser({ name, email, password });
   };
+
+  if (auth.isLoading) return null;
+
+  if (auth.isAuthenticated) return <Redirect to="/dashboard" />;
 
   return (
     <Fragment>
@@ -92,7 +98,11 @@ RegisterPage.propTypes = {
   setAlert: PropTypes.func.isRequired
 };
 
+const mapStateToProps = createStructuredSelector({
+  auth: selectAuth
+});
+
 export default connect(
-  null,
-  { setAlert }
+  mapStateToProps,
+  { setAlert, registerUser }
 )(RegisterPage);

@@ -1,7 +1,12 @@
 import React, { Fragment, useState } from 'react';
-import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
+import { Link, Redirect } from 'react-router-dom';
+import { loginUser } from '../redux/resources/auth/auth.actions';
+import { selectAuth } from '../redux/resources/auth/auth.selectors';
 
-const LoginPage = () => {
+const LoginPage = ({ loginUser, auth }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -14,8 +19,12 @@ const LoginPage = () => {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    console.log('success');
+    loginUser(formData);
   };
+
+  if (auth.isLoading) return null;
+
+  if (auth.isAuthenticated) return <Redirect to="/dashboard" />;
 
   return (
     <Fragment>
@@ -30,7 +39,7 @@ const LoginPage = () => {
       >
         <div className="form-group">
           <input
-            type="email"
+            type="text"
             placeholder="Email Address"
             name="email"
             value={email}
@@ -46,7 +55,6 @@ const LoginPage = () => {
             type="password"
             placeholder="Password"
             name="password"
-            minLength="6"
             value={password}
             onChange={handleChange}
           />
@@ -60,4 +68,16 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+LoginPage.propTypes = {
+  loginUser: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired
+};
+
+const mapStateToProps = createStructuredSelector({
+  auth: selectAuth
+});
+
+export default connect(
+  mapStateToProps,
+  { loginUser }
+)(LoginPage);
