@@ -236,7 +236,19 @@ img {
 
 /* Forms */
 .form .form-group {
-  margin: 1.2rem 0;
+  margin: 1.8rem 0;
+  position: relative;
+
+  &__error {
+    font-size: 0.8rem;
+    color: red;
+    position: absolute;
+    bottom: -1.4rem;
+  }
+
+  &.invalid input {
+    border-color: red;
+  }
 }
 
 .form .form-text {
@@ -575,3 +587,5 @@ button {
     padding: 0.3rem 0.4rem;
   }
 }
+
+// =========== MY STYLES ====================

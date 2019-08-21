@@ -20,6 +20,7 @@
   "homepage": "https://github.com/eugenekhristo/devconnector#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "classnames": "^2.2.6",
     "config": "^3.2.2",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
@@ -30,6 +31,7 @@
     "lodash": "^4.17.15",
     "mongoose": "^5.6.7",
     "mongoose-acid": "^0.12.0",
+    "redux-form": "^8.2.6",
     "request": "^2.88.0",
     "uuid": "^3.3.2",
     "winston": "^3.2.1",

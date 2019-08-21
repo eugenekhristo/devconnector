@@ -1,7 +1,5 @@
 import axios from 'axios';
 import {
-  LOGIN_FAIL,
-  LOGIN_SUCCESS,
   LOGOUT,
   AUTH_FAIL,
   AUTH_SUCCESS,
@@ -23,40 +21,43 @@ export const authUser = () => async dispatch => {
   }
 };
 
-export const loginUser = ({ email, password }) => async dispatch => {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
+// export const loginUser = ({ email, password }) => async dispatch => {
+//   const config = {
+//     headers: {
+//       'Content-Type': 'application/json'
+//     }
+//   };
 
-  const body = JSON.stringify({ email, password });
+//   const body = JSON.stringify({ email, password });
 
-  try {
-    const {
-      data: { user },
-      headers
-    } = await axios.post('/api/auth/login', body, config);
+//   try {
+//     const {
+//       data: { user },
+//       headers
+//     } = await axios.post('/api/auth/login', body, config);
 
-    const payload = {
-      user: { ...user },
-      jwt: headers['x-auth-token']
-    };
+//     const payload = {
+//       user: { ...user },
+//       jwt: headers['x-auth-token']
+//     };
 
-    localStorage.setItem('jwt', payload.jwt);
-    setAuthToken(localStorage.jwt);
+//     localStorage.setItem('jwt', payload.jwt);
+//     setAuthToken(localStorage.jwt);
 
-    dispatch({
-      type: LOGIN_SUCCESS,
-      payload
-    });
-  } catch (error) {
-    error.response.data.errors.forEach(error => dispatch(setAlert(error.msg)));
-    dispatch({
-      type: LOGIN_FAIL
-    });
-  }
-};
+//     dispatch({
+//       type: LOGIN_SUCCESS,
+//       payload
+//     });
+
+//     return null;
+//   } catch (error) {
+//     // error.response.data.errors.forEach(error => dispatch(setAlert(error.msg)));
+//     dispatch({
+//       type: LOGIN_FAIL
+//     });
+//     return new SubmissionError({ email: error.response.data.errors[0].msg });
+//   }
+// };
 
 export const registerUser = ({ name, email, password }) => async dispatch => {
   const config = {

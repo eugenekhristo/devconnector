@@ -1,25 +1,52 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { Link, Redirect } from 'react-router-dom';
-import { loginUser } from '../redux/resources/auth/auth.actions';
+import axios from 'axios';
+import { SubmissionError } from 'redux-form';
 import { selectAuth } from '../redux/resources/auth/auth.selectors';
+import LoginForm from '../components/forms/login-form/LoginForm';
+import { setAuthToken } from '../redux/resources/auth/auth.utils';
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL
+} from './../redux/resources/auth/auth.types';
 
-const LoginPage = ({ loginUser, auth }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+const LoginPage = ({ dispatch, auth }) => {
+  const handleSubmit = async values => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
 
-  const { email, password } = formData;
+    const body = JSON.stringify(values);
 
-  const handleChange = ({ target: { name, value } }) =>
-    setFormData({ ...formData, [name]: value });
+    try {
+      const {
+        data: { user },
+        headers
+      } = await axios.post('/api/auth/login', body, config);
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    loginUser(formData);
+      const payload = {
+        user: { ...user },
+        jwt: headers['x-auth-token']
+      };
+
+      localStorage.setItem('jwt', payload.jwt);
+      setAuthToken(localStorage.jwt);
+
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload
+      });
+    } catch (error) {
+      dispatch({
+        type: LOGIN_FAIL
+      });
+      throw new SubmissionError({ email: error.response.data.errors[0].msg });
+    }
   };
 
   if (auth.isLoading) return null;
@@ -32,35 +59,7 @@ const LoginPage = ({ loginUser, auth }) => {
       <p className="lead">
         <i className="fas fa-user" /> Login into Your Account
       </p>
-      <form
-        className="form"
-        action="create-profile.html"
-        onSubmit={handleSubmit}
-      >
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Email Address"
-            name="email"
-            value={email}
-            onChange={handleChange}
-          />
-          <small className="form-text">
-            This site uses Gravatar so if you want a profile image, use a
-            Gravatar email
-          </small>
-        </div>
-        <div className="form-group">
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-          />
-        </div>
-        <input type="submit" className="btn btn-primary" value="Login" />
-      </form>
+      <LoginForm onSubmit={handleSubmit} />
       <p className="my-1">
         Don't have an account? <Link to="/register">Sign Up</Link>
       </p>
@@ -69,15 +68,12 @@ const LoginPage = ({ loginUser, auth }) => {
 };
 
 LoginPage.propTypes = {
-  loginUser: PropTypes.func.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired
+  // loginUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
 };
 
 const mapStateToProps = createStructuredSelector({
   auth: selectAuth
 });
 
-export default connect(
-  mapStateToProps,
-  { loginUser }
-)(LoginPage);
+export default connect(mapStateToProps)(LoginPage);
