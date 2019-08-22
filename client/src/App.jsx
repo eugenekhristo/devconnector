@@ -7,7 +7,9 @@ import Alert from './components/Alert';
 import LandingPage from './pages/LandingPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import Dashboard from './pages/Dashboard';
 import { authUser } from './redux/resources/auth/auth.actions';
+import ProtectedRoute from './components/routing/ProtectedRoute';
 
 const App = ({ authUser }) => {
   useEffect(() => {
@@ -23,6 +25,7 @@ const App = ({ authUser }) => {
         <Switch>
           <Route path="/register" component={RegisterPage} />
           <Route path="/login" component={LoginPage} />
+          <ProtectedRoute path="/dashboard" component={Dashboard} />
         </Switch>
       </section>
     </Fragment>
